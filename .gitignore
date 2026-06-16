@@ -1,0 +1,16 @@
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Backups
+*.bak*
+
+# Environment / Credentials
+.env
+*.local.json
+credentials.json
+token.json
+
+# Dependencies & Logs
+node_modules/
+*.log
