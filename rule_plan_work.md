@@ -88,8 +88,13 @@
 * **Git 관리**:
   * 깃허브 원격 저장소 force push 완료 (GITHUB_PAT 사용).
 
-* **260616_1430 추가 개선**:
+* **260616_1637 추가 개선**:
   * 페르소나 작업별 유동 조정, 날짜 형식 YYMMDD_HHMM 통일.
   * antithesis n회 에이전트 자율 결정, setup에서 사용자 n 선호 질문 추가.
   * git 커밋 co-author 제거 (includeCoAuthoredBy: false).
-  * boost step 5 + manage 일일 업데이트 확인 절차 추가, 커밋/푸시 완료.
+  * boost step 5 + manage 일일 업데이트 확인 절차 추가.
+  * antithesis 실증 1회 실행 — 7개 문제 발견, 5개 채택. log_for_test/260616_1637_claude.md 기록.
+  * antithesis 적용 범위 확장: 코드·조사·설계 모두 포함, 단순 답변만 제외.
+  * RULES.md → AGENTS.md 리네임 (2026 업계 표준 대응).
+  * RPW Rules 섹션 3-tier 구조로 개편 (Always do / Ask first / Never do).
+  * 벤치마킹 결과: 설계 방향 확인, semantic memory / observability / AGENTS.md 3-tier 개선 포인트 발굴.
