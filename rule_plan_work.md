@@ -30,8 +30,8 @@
 - [x] boost 미적용(G1) → 지시 층으로 해결 (글로벌 강제 훅 폐기: 카테고리 오류 + 전 세션 오염). AGENTS 7절·템플릿·CLAUDE.md에 "세션 시작 시 boost 우선" 명시
 - [x] 강제 층 어댑터 생명주기를 manage에 문서화 (치명적 소수만, 제안→승인)
 - [x] 룰 파일명 꼬임 방지: setup 1단계로 "룰 주입"(AGENTS.md 표준 + 예외 블랙리스트 + import 우선 + 결정론적 검증). README 보강. (sentinel 자가검증·전 에이전트 카탈로그 기각)
-- [ ] feedback v2: log_for_test md 커밋 + 자동화
-- [ ] antithesis 정지 조건: 최대 라운드 상한 + 사용자 중재
+- [x] feedback v2: log_for_test md 커밋 자동화 (그 파일만 add·rebase 2회·범위/비밀 점검). 이슈 모델 폐기(.github 제거), FEEDBACK_TEMPLATE를 log_for_test로. 브랜치/PR은 ROADMAP 보류
+- [x] antithesis 정지 조건: 수렴 추세 1차 + 횟수 상한(3/최대5) 안전망 + 발산 시 안정본 보존·사용자 중재 예외. ("라운드↑=안전" 전제 기각)
 - [ ] feedback 스킬 v2: log_for_test md 커밋 + 자동화 (동시성·푸시거부·비밀스캔 반영) — 토대 위에서 진행
 - [ ] antithesis 정지 조건: 최대 라운드 상한 + 사용자 중재 (Gemini 1556)
 
@@ -49,7 +49,7 @@
 
 ## Work
 
-실증 피드백 검토 진행 중. 토대(성역 예외 명문화 + 에이전트별 state 파일 + boost silent-skip 제거) 적용·푸시 완료. SessionStart 훅(boost 강제 트리거)은 글로벌 settings.json 수정이라 사용자 승인 대기. 남은 것: feedback v2(커밋 모델), antithesis 정지 조건. 안티테제 2회로 B-1(룰 파일 경로 박기)·feedback-v1 설계 결함 기각.
+실증 피드백 5건 전부 검토·반영 완료(안티테제 6회). 성역 예외 명문화, 에이전트별 state 파일, boost silent-skip 제거+지시층 boost우선, 룰 파일명 주입(표준+예외), feedback v2(가드 포함 md 커밋·이슈모델 폐기), antithesis 정지조건(수렴 추세). 강제 층은 manage가 관리(치명적 소수만). SessionStart 훅은 카테고리 오류로 폐기.
 
 이전: ROADMAP.md(리소스 예약 원장 보류 설계), CHANGELOG.md + v0.1.0 태그(버전 관리), feedback 스킬 + GitHub 이슈 템플릿(사용 중 피드백 채널) 추가. 스킬 12종. 피드백은 성역 원칙상 저장소 직접 수정 대신 이슈로, 환경별 분기(API 직접/수동 붙여넣기).
 
