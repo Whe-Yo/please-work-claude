@@ -45,7 +45,7 @@
 ### 지능 재료: 글로벌 규칙셋 ([rules/AGENTS.md](rules/AGENTS.md))
 에이전트의 사고·검증·보고 절차를 강제하는 범용 행동 원칙. 에이전트 룰 파일(AGENTS.md, CLAUDE.md, .cursorrules 등)에 주입하거나, 에이전트 시스템 프롬프트에 붙여넣어 사용합니다.
 
-### 행동 재료: 스킬 11종 ([skills/](skills/))
+### 행동 재료: 스킬 12종 ([skills/](skills/))
 상황에 따라 에이전트가 로드해 자율 수행하는 절차 지침서. 전체 목록은 [`skills/SKILL_INDEX.md`](skills/SKILL_INDEX.md)를 참고합니다.
 
 ### 도구 재료: MCP 템플릿 ([mcp/mcp_template.json](mcp/mcp_template.json))

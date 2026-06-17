@@ -23,7 +23,7 @@
 
 ## Plan
 
-목표: resource 스킬 추가 (리소스 관리, 스냅샷 전용)
+목표: 보류 설계 기록 + 버전 관리 + 피드백 채널
 
 - [x] Harnessing_Agent → please-work-harness 디렉토리·참조·GitHub 원격명 리네임
 - [x] agents_chat.md 프로젝트 내 이동 + gitignore
@@ -39,6 +39,8 @@
 
 ## Work
 
-resource 스킬 추가 완료 — 무거운 작업 착수 전 호스트 리소스 라이브 조회·보고(저장 없음, 호스트별 분기). 3차 안티테제로 큐·스코프계층·좀비GC 기각(자기모순·과잉설계), 스냅샷 전용으로 축소. Mac에서 ps 폴백 동작 검증. SKILL_INDEX·README(11종)·Claude 커맨드 동기화.
+ROADMAP.md(리소스 예약 원장 보류 설계), CHANGELOG.md + v0.1.0 태그(버전 관리), feedback 스킬 + GitHub 이슈 템플릿(사용 중 피드백 채널) 추가. 스킬 12종. 피드백은 성역 원칙상 저장소 직접 수정 대신 이슈로, 환경별 분기(API 직접/수동 붙여넣기).
+
+이전: resource 스킬 추가 완료 — 무거운 작업 착수 전 호스트 리소스 라이브 조회·보고(저장 없음, 호스트별 분기). 3차 안티테제로 큐·스코프계층·좀비GC 기각(자기모순·과잉설계), 스냅샷 전용으로 축소. Mac에서 ps 폴백 동작 검증. SKILL_INDEX·README(11종)·Claude 커맨드 동기화.
 
 이전: 업데이트 5단계 완료. README 2층 모델 + AGENTS.md signal density + RPW 템플릿 WHY/Never do + 버그 4건 + Claude 어댑터 동기화 + 강제 층(.env Read deny). 절차 동작은 state파일→manage fetch 체인으로 실행 검증함. 강제 층 deny 규칙은 스키마 검증 완료, 현재 세션 즉시 활성 여부는 Claude Code 핫리로드 의존(재시작 시 확실). 제미나이(안티그래비티)와 agents_chat.md로 교차 협업 중.
