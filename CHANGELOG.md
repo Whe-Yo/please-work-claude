@@ -5,7 +5,12 @@
 업데이트 확인(`manage`의 일일 점검)은 이 파일과 git 태그를 기준점으로 삼을 수 있다.
 
 ## [Unreleased]
-- (다음 변경을 여기에 누적)
+### Changed
+- **범용 하네스 → Claude 전용 하네스로 정체성 전환.** 레포 `please-work-harness` → `please-work-claude`. "어디에나 적용 가능"은 시기상조 — 강제 층이 런타임 종속이고 모델별 미끄러짐이 달라 Claude에 집중.
+- `rules/AGENTS.md` → `rules/CLAUDE.md`. 적용은 `~/.claude/CLAUDE.md` 주입.
+- 2층 구조에서 "에이전트별 어댑터" 추상화 제거 → 강제 층 = Claude Code Hooks·permissions로 직접 명시.
+- README·setup·boost·manage에서 에이전트 비종속/AGENTS.md 표준 프레이밍 제거.
+- (제미나이용은 please-work-gemini, Claude×Gemini 오케스트레이션은 please-work-clemini로 분리.)
 
 ## [0.1.0] - 260617
 프로토타입 첫 버전. 핵심 3축(적응형 하네싱 / RPW / N회 안티테제) + 2층 구조 정립.
