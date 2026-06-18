@@ -5,6 +5,9 @@
 업데이트 확인(`manage`의 일일 점검)은 이 파일과 git 태그를 기준점으로 삼을 수 있다.
 
 ## [Unreleased]
+- (다음 변경을 여기에 누적)
+
+## [0.2.0] - 260618
 ### Changed
 - **범용 하네스 → Claude 전용 하네스로 정체성 전환.** 레포 `please-work-harness` → `please-work-claude`. "어디에나 적용 가능"은 시기상조 — 강제 층이 런타임 종속이고 모델별 미끄러짐이 달라 Claude에 집중.
 - `rules/AGENTS.md` → `rules/CLAUDE.md`. 적용은 `~/.claude/CLAUDE.md` 주입.
