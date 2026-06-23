@@ -5,7 +5,13 @@
 업데이트 확인(`manage`의 일일 점검)은 이 파일과 git 태그를 기준점으로 삼을 수 있다.
 
 ## [Unreleased]
-- (다음 변경을 여기에 누적)
+### Added
+- **능동 피드백 규칙**: `rules/CLAUDE.md` 6절에 "하네스 실사용 중 버그·마찰·개선점 발견 시 사용자 지시 없이도 `feedback` 스킬로 `log_for_test/`에 즉시 기록" 능동 지침 추가. WHY: 다른 세션이 침묵하면 같은 결함이 반복 — 하네스는 실사용 마찰을 모아야 개선된다.
+### Fixed
+- **SKILL_INDEX feedback 설명 정정**(피드백 260623_1819 DOC-1): "GitHub 이슈로 보고" → "`log_for_test/`에 md 기록·커밋", 트리거 "피드백 남겨"로 정렬.
+- **삭제제한 마운트 대응**(피드백 260623_1819 FRICTION-1): `feedback` 스킬 6절에 잔존 `.git/index.lock` 제거 후 md 출력 폴백 절차 추가. 정체 락 제거로 클론 git wedge 해소.
+### Removed
+- 잘못 보관됐던 clemini 대상 피드백(260618_1605)을 clemini `log_for_test/`로 이전(중복 제거).
 
 ## [0.2.0] - 260618
 ### Changed

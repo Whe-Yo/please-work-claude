@@ -49,3 +49,10 @@ enhancement (doc)
 
 ### 권장 대응
 - SKILL_INDEX의 feedback 행 설명을 "log_for_test/에 md로 기록·커밋"으로 정정(현행 절차와 일치).
+
+---
+
+## 반영 (260623)
+
+- **[FRICTION-1] 삭제제한 마운트 → index.lock wedge** → **반영(완화)**. (1) 정체된 `.git/index.lock`을 제거해 3개 클론 git wedge 해소. (2) `skills/feedback/SKILL.md` 6절(환경 분기)에 "삭제제한 마운트·잔존 락 제거 후 폴백" 절차 추가. 근본(마운트 unlink EPERM)은 런타임 특성이라 코드로 못 막음 → 절차로 완화. **종결.**
+- **[DOC-1] SKILL_INDEX feedback 설명 불일치** → **반영**. `skills/SKILL_INDEX.md` feedback 행을 "`log_for_test/`에 md로 기록·커밋(GitHub 이슈 아님)"으로 정정, 트리거도 "피드백 남겨"로 정렬. **종결.**
