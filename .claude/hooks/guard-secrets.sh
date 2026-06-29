@@ -4,6 +4,9 @@
 # bash 3.2 호환. 의존: jq.
 set -u
 
+# fail-closed: jq 없으면 아래 파싱이 빈 문자열→무음 통과(fail-open)가 된다(260629 피드백). 차단으로.
+command -v jq >/dev/null 2>&1 || { echo "차단(강제층): jq 미설치 — 보안 가드 작동 불가. jq 설치 후 사용(brew install jq / apt install jq). fail-open 방지." >&2; exit 2; }
+
 # 비밀로 간주하는 경로/파일 패턴 (앞뒤 경계로 단어 단위 매칭)
 SECRET_PATH='(^|[^A-Za-z0-9._-])(\.env([./A-Za-z0-9_-]*)?|id_rsa|id_dsa|id_ecdsa|id_ed25519|[A-Za-z0-9._-]+\.(pem|p12|pfx))([^A-Za-z0-9]|$)'
 # 경계 비소비형 코어 (Bash 명령 매칭용 — 동사 뒤 공백을 경계로 재사용)

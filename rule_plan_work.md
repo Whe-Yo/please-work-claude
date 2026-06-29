@@ -48,3 +48,5 @@
 독립 antithesis 1회로 강제층 자가검증(dogfood, 260626) — "불가" 판정에서 핵심 결함 3개 잡힘: Stop "작업당 1회"가 거짓(매 턴 재차단)·guard-secrets가 cat 외 awk/sed/python 우회 가능·guard-git이 rebase -i/clean -f 등 미탐. → 세션당 1회·READ_VERB 확장·파괴적 패턴 추가로 수정·재검증(37케이스 통과). 잔여(변수간접 우회·fail-open·글로벌 병합 시 경로 고정)는 셸훅 가드레일의 본질적 한계로 인정·문서화(README "위반 불가"→"가드레일"로 정정). 완전 차단이 필요한 항목은 Claude Code permission deny로 보강 권장(백로그).
 
 전역 설치 후 "일상 작업 안전성" 독립 검토(260626) → guard-git가 일상 루틴(`branch -D`·`checkout/restore .`·`clean -f`·`rebase -i`·`--force-with-lease`)을 과차단, guard-secrets가 `.key`·`.envrc`·`.env.d.ts`를 오차단함을 확인 → **완화**(가드레일을 '치명·비가역'에만 한정: force-push·reset --hard·filter-branch·update-ref -d·reflog expire·.env·자격증명만 차단). SessionStart도 RPW 게이트 추가(무관 프로젝트 미주입). 재검증 33/33, 맥미니 `~/.claude` 재설치 완료.
+
+260629 외부 피드백(jq 미설치 시 guard fail-open 무음 통과 — 다른 환경서 실증) 반영: guard-secrets/guard-git에 jq 부재 시 **fail-closed(exit 2)** 추가(무음 통과 제거), setup 6-2에 **jq 사전점검 + 검증 필수게이트**(통과 못 하면 설치완료 보고 금지) 추가. 정상회귀 + jq-missing 시뮬 검증.

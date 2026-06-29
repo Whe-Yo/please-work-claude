@@ -41,10 +41,11 @@ description: 최초 1회 실행. 스킬 인덱스를 읽고 현재 에이전트 
    - 에이전트 스킬 폴더가 명확하지 않으면 사용자에게 위치를 확인한다.
 
 6-2. **강제 층 설치 (Hook 지원 환경 = Claude Code)**: 이 저장소의 [`.claude/`](../../.claude/) 강제 층을 사용자 환경에 설치한다(§9·§7을 하드 강제).
+   - **의존성 사전 점검(필수)**: 훅은 `jq`에 의존한다. `command -v jq`가 실패하면 **먼저 jq를 설치**(`brew install jq` / `apt install -y jq`)한다. 설치 불가 시 강제 층 설치를 **중단·경고**한다. (jq 없으면 guard-secrets/guard-git은 fail-closed로 차단하지만, 검증을 건너뛰면 무력 상태를 모를 수 있다 — 260629 피드백.)
    - `.claude/hooks/`의 `guard-secrets.sh`·`guard-git.sh`·`session-start-boost.sh`·`mark-work.sh`·`stop-antithesis.sh`를 사용자 훅 위치(예: `~/.claude/hooks/`)로 복사(실행권한 유지).
    - `.claude/settings.json`의 `hooks` 블록을 사용자 `~/.claude/settings.json`(또는 프로젝트 `.claude/settings.json`)에 **병합**하고, `command`의 `${CLAUDE_PROJECT_DIR}`를 복사한 실제 경로로 치환한다(덮어쓰기 금지·멱등).
    - 효과: `.env`·자격증명 읽기와 force-push·`reset --hard`·history rewrite를 PreToolUse가 **하드 차단**(exit 2), 세션 시작 시 boost 환기, 주요 작업 후 antithesis 미실행 시 Stop이 턴 종료를 막고 환기.
-   - 검증(1회): `echo '{"tool_name":"Read","tool_input":{"file_path":"/x/.env"}}' | ~/.claude/hooks/guard-secrets.sh; echo $?` → `2`(차단)이면 정상.
+   - **검증 게이트(필수 — 통과 못 하면 "설치 완료" 보고 금지)**: `echo '{"tool_name":"Read","tool_input":{"file_path":"/x/.env"}}' | ~/.claude/hooks/guard-secrets.sh; echo $?` 가 반드시 **`2`(차단)**여야 한다. `0`(통과)이면 가드 무력(jq 누락 등) → 원인 해결 후 재검증. force-push도 `printf '{"tool_name":"Bash","tool_input":{"command":"git push --force"}}' | ~/.claude/hooks/guard-git.sh; echo $?` → `2` 확인.
 
 7. **상태 파일 초기화**: `~/.agents/harnessing_state_{에이전트}.json`을 생성한다 (예: `harnessing_state_claude.json`, `harnessing_state_gemini.json`). **에이전트별 개별 파일**이어야 한다 — 한 머신에서 여러 에이전트가 각자 클론을 가지므로, 단일 공유 파일은 서로 덮어쓴다(클로버).
    - `~/.agents/`는 프로젝트 무관 전역 위치다. 따라서 setup 세션과 다른 프로젝트 작업 세션에서도 이 파일을 절대경로로 읽어 클론 위치를 알 수 있다 (세션 분리 문제 해결).

@@ -3,6 +3,9 @@
 # 차단 = exit 2. 일반 push/pull/commit/reset(soft·mixed)은 통과. bash 3.2 호환. 의존: jq.
 set -u
 
+# fail-closed: jq 없으면 파싱이 빈 문자열→무음 통과(fail-open)가 된다(260629 피드백). 차단으로.
+command -v jq >/dev/null 2>&1 || { echo "차단(강제층): jq 미설치 — 파괴적 git 가드 작동 불가. jq 설치 후 사용. fail-open 방지." >&2; exit 2; }
+
 input="$(cat)"
 [ "$(printf '%s' "$input" | jq -r '.tool_name // empty' 2>/dev/null)" = "Bash" ] || exit 0
 cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)"
