@@ -1,5 +1,5 @@
 {
-  "$comment": "please-work-claude 강제 층(§9 금지 + §7 boost + §6 antithesis) 템플릿. setup이 이 hooks 블록을 사용자 ~/.claude/settings.json(또는 프로젝트 .claude/settings.json)에 병합하고 command 경로의 ${CLAUDE_PROJECT_DIR}를 실제 설치 경로로 치환한다. PreToolUse는 exit 2로 도구를 하드 차단, Stop은 decision:block으로 antithesis 미실행 시 턴 종료를 1회 막아 환기한다.",
+  "$comment": "please-work-claude 강제/가시성 층 템플릿. setup이 이 hooks 블록을 사용자 ~/.claude/settings.json(또는 프로젝트 .claude/settings.json)에 병합하고 command 경로의 ${CLAUDE_PROJECT_DIR}를 실제 설치 경로로 치환한다. PreToolUse=하드 차단(exit 2), Stop=antithesis 게이트, UserPromptSubmit=매 턴 프로세스 상태 주입(260701 가시성), PostToolUse=상태 카운터.",
   "hooks": {
     "PreToolUse": [
       {
@@ -15,9 +15,24 @@
         ]
       },
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Write|NotebookEdit",
         "hooks": [
           { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/mark-work.sh" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Task|WebSearch|WebFetch",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/track-tools.sh" }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/process-status.sh" }
         ]
       }
     ],

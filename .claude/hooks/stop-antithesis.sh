@@ -2,7 +2,7 @@
 # stop-antithesis.sh — §6 antithesis 자동화 (Stop 훅).
 # 주요 작업(파일 편집)이 있었는데 턴을 끝내려 하면 1회 막고 antithesis를 환기한다.
 # 무한루프 차단: (a) stop_hook_active=true면 통과, (b) 세션당 1회만(nudged 마커 — 한 번 환기 후 영구 통과).
-# 오발동 방지: RPW 있는 하네스 관리 프로젝트에서만. bash 3.2 호환. 의존: jq.
+# 발동: 주요 작업(편집 3회↑) 후 독립검토 0회일 때 세션당 1회(RPW 존재 무관). bash 3.2 호환. 의존: jq.
 set -u
 input="$(cat)"
 
@@ -11,17 +11,17 @@ active="$(printf '%s' "$input" | jq -r '.stop_hook_active // false' 2>/dev/null)
 [ "$active" = "true" ] && exit 0
 
 sid="$(printf '%s' "$input" | jq -r '.session_id // "nosession"' 2>/dev/null)"
-cwd="$(printf '%s' "$input" | jq -r '.cwd // empty' 2>/dev/null)"
-
-# 하네스 관리 프로젝트(RPW 존재)에서만 환기 — 무관 프로젝트 오발동 방지
-[ -n "$cwd" ] && { [ -f "$cwd/rule_plan_work.md" ] || [ -f "$cwd/work.md" ]; } || exit 0
+[ -n "$sid" ] || sid=nosession
 
 dir="${HOME}/.claude/.harness_state"
-work="$dir/${sid}.work"
 nudged="$dir/${sid}.nudged"
 
-# 편집 흔적 없으면 통과
-[ -f "$work" ] || exit 0
+# 발동 기준 = 주요 작업(편집 3회↑), RPW 존재 무관 (260701 B1: RPW 게이트가 실전 프로젝트서 antithesis를 꺼버렸다).
+edits=$(cat "$dir/${sid}.edits" 2>/dev/null || echo 0); case "$edits" in *[!0-9]*) edits=0 ;; esac
+[ "$edits" -ge 3 ] || exit 0
+# 이미 서브에이전트(독립검토 등) 돌았으면 통과
+review=$(cat "$dir/${sid}.review" 2>/dev/null || echo 0); case "$review" in *[!0-9]*) review=0 ;; esac
+[ "$review" -ge 1 ] && exit 0
 # 세션당 1회만 환기 — 이미 환기했으면 통과(매 턴 재차단·나그 방지)
 [ -f "$nudged" ] && exit 0
 

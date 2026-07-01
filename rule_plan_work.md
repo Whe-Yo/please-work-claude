@@ -51,4 +51,6 @@
 
 260629 외부 피드백(jq 미설치 시 guard fail-open 무음 통과 — 다른 환경서 실증) 반영: guard-secrets/guard-git에 jq 부재 시 **fail-closed(exit 2)** 추가(무음 통과 제거), setup 6-2에 **jq 사전점검 + 검증 필수게이트**(통과 못 하면 설치완료 보고 금지) 추가. 정상회귀 + jq-missing 시뮬 검증.
 
-추가 실전 피드백(260629_2349 Windows·260701 Linux) 반영: ① fail-closed의 전-도구 마비를 **jq 절대경로 폴백** 탐색으로 해소(PATH 미포함이어도 찾음) ② guard-git **커밋메시지 거짓양성**을 인용 구간 제거로 차단(`commit -m "...push --force..."` 통과) ③ guard-secrets **`.pub`·`~/.ssh/` 과차단 해소**(개인키만 차단, config/known_hosts/공개키 허용) ④ 마커 정리(7일 TTL)·Windows `bash.exe` 설치 절차. 15케이스 검증·재설치. **소프트규칙 실전 미실행(260701 B/C)은 별도 분석 진행.**
+추가 실전 피드백(260629_2349 Windows·260701 Linux) 반영: ① fail-closed의 전-도구 마비를 **jq 절대경로 폴백** 탐색으로 해소(PATH 미포함이어도 찾음) ② guard-git **커밋메시지 거짓양성**을 인용 구간 제거로 차단(`commit -m "...push --force..."` 통과) ③ guard-secrets **`.pub`·`~/.ssh/` 과차단 해소**(개인키만 차단, config/known_hosts/공개키 허용) ④ 마커 정리(7일 TTL)·Windows `bash.exe` 설치 절차. 15케이스 검증·재설치.
+
+**소프트규칙 실전 미실행(260701 B/C) 반영 — 가시성 층 구현:** 원인 = 넛지형(RPW·antithesis·위임)이 에이전트 내부라 '안 보여서' 안 돌고, antithesis Stop 게이트가 RPW존재 조건이라 실전(비-하네스) 프로젝트서 아예 꺼짐. → ① `process-status.sh`(UserPromptSubmit, 매 턴) = [RPW·편집·antithesis·agy위임·조사] 상태 + 조건부 넛지(RPW생성/검토/위임)를 매 턴 노출(사용자에게도 알리도록). ② `track-tools.sh`(PostToolUse) = Task/WebSearch/agy 카운터 갱신, mark-work=편집 카운터. ③ stop-antithesis 게이트를 **RPW존재→편집 3회↑**로 수정(실전서도 발동). 흐름 시뮬 검증·재설치 완료. (④ RPW 자동 스켈레톤·위임 하드트리거는 넛지로 1차 대응, 필요 시 강화.)
