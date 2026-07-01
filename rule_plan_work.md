@@ -50,3 +50,5 @@
 전역 설치 후 "일상 작업 안전성" 독립 검토(260626) → guard-git가 일상 루틴(`branch -D`·`checkout/restore .`·`clean -f`·`rebase -i`·`--force-with-lease`)을 과차단, guard-secrets가 `.key`·`.envrc`·`.env.d.ts`를 오차단함을 확인 → **완화**(가드레일을 '치명·비가역'에만 한정: force-push·reset --hard·filter-branch·update-ref -d·reflog expire·.env·자격증명만 차단). SessionStart도 RPW 게이트 추가(무관 프로젝트 미주입). 재검증 33/33, 맥미니 `~/.claude` 재설치 완료.
 
 260629 외부 피드백(jq 미설치 시 guard fail-open 무음 통과 — 다른 환경서 실증) 반영: guard-secrets/guard-git에 jq 부재 시 **fail-closed(exit 2)** 추가(무음 통과 제거), setup 6-2에 **jq 사전점검 + 검증 필수게이트**(통과 못 하면 설치완료 보고 금지) 추가. 정상회귀 + jq-missing 시뮬 검증.
+
+추가 실전 피드백(260629_2349 Windows·260701 Linux) 반영: ① fail-closed의 전-도구 마비를 **jq 절대경로 폴백** 탐색으로 해소(PATH 미포함이어도 찾음) ② guard-git **커밋메시지 거짓양성**을 인용 구간 제거로 차단(`commit -m "...push --force..."` 통과) ③ guard-secrets **`.pub`·`~/.ssh/` 과차단 해소**(개인키만 차단, config/known_hosts/공개키 허용) ④ 마커 정리(7일 TTL)·Windows `bash.exe` 설치 절차. 15케이스 검증·재설치. **소프트규칙 실전 미실행(260701 B/C)은 별도 분석 진행.**

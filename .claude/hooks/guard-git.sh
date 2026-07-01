@@ -3,18 +3,22 @@
 # 차단 = exit 2. 일반 push/pull/commit/reset(soft·mixed)은 통과. bash 3.2 호환. 의존: jq.
 set -u
 
-# fail-closed: jq 없으면 파싱이 빈 문자열→무음 통과(fail-open)가 된다(260629 피드백). 차단으로.
-command -v jq >/dev/null 2>&1 || { echo "차단(강제층): jq 미설치 — 파괴적 git 가드 작동 불가. jq 설치 후 사용. fail-open 방지." >&2; exit 2; }
+# jq 탐색: PATH 우선, 없으면 절대경로 폴백(260629_2349 — PATH 미포함 시 전 도구 마비 방지). 진짜 부재 시만 fail-closed.
+JQ=""; for j in jq "$HOME/.local/bin/jq" /opt/homebrew/bin/jq /usr/local/bin/jq /usr/bin/jq /mingw64/bin/jq; do command -v "$j" >/dev/null 2>&1 && { JQ="$j"; break; }; done
+[ -n "$JQ" ] || { echo "차단(강제층): jq를 못 찾음 — 파괴적 git 가드 작동 불가. jq 설치하거나 훅 일시 비활성화. fail-open 방지." >&2; exit 2; }
 
 input="$(cat)"
-[ "$(printf '%s' "$input" | jq -r '.tool_name // empty' 2>/dev/null)" = "Bash" ] || exit 0
-cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)"
+[ "$(printf '%s' "$input" | "$JQ" -r '.tool_name // empty' 2>/dev/null)" = "Bash" ] || exit 0
+cmd="$(printf '%s' "$input" | "$JQ" -r '.tool_input.command // empty' 2>/dev/null)"
 [ -n "$cmd" ] || exit 0
 
-# git이 포함된 명령만 검사
-printf '%s' "$cmd" | grep -Eq '(^|[|&;(\`[:space:]])git([[:space:]]|$)' || exit 0
+# 인용 구간(-m 메시지·echo 문자열 등) 제거 후 검사 — `git commit -m "...push --force..."` 거짓양성 방지(260629_2349).
+scan="$(printf '%s' "$cmd" | sed -E 's/"[^"]*"//g' | sed -E "s/'[^']*'//g")"
 
-has() { printf '%s' "$cmd" | grep -Eq "$1"; }
+# git이 포함된 명령만 검사(인용 제거본 기준 — echo "git push --force"는 제외됨)
+printf '%s' "$scan" | grep -Eq '(^|[|&;(\`[:space:]])git([[:space:]]|$)' || exit 0
+
+has() { printf '%s' "$scan" | grep -Eq "$1"; }
 deny() { echo "차단(§9): 파괴적 git — $1. 명시 승인이 필요하다(히스토리 유실 위험). 정말 의도했다면 터미널에서 직접 실행하거나 훅을 일시 비활성화하라. 명령: $cmd" >&2; exit 2; }
 
 # force push (--force / -f) — 단 안전한 --force-with-lease / --force-if-includes는 면제(일상검토 260626)

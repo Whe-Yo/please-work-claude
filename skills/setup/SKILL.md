@@ -44,6 +44,7 @@ description: 최초 1회 실행. 스킬 인덱스를 읽고 현재 에이전트 
    - **의존성 사전 점검(필수)**: 훅은 `jq`에 의존한다. `command -v jq`가 실패하면 **먼저 jq를 설치**(`brew install jq` / `apt install -y jq`)한다. 설치 불가 시 강제 층 설치를 **중단·경고**한다. (jq 없으면 guard-secrets/guard-git은 fail-closed로 차단하지만, 검증을 건너뛰면 무력 상태를 모를 수 있다 — 260629 피드백.)
    - `.claude/hooks/`의 `guard-secrets.sh`·`guard-git.sh`·`session-start-boost.sh`·`mark-work.sh`·`stop-antithesis.sh`를 사용자 훅 위치(예: `~/.claude/hooks/`)로 복사(실행권한 유지).
    - `.claude/settings.json`의 `hooks` 블록을 사용자 `~/.claude/settings.json`(또는 프로젝트 `.claude/settings.json`)에 **병합**하고, `command`의 `${CLAUDE_PROJECT_DIR}`를 복사한 실제 경로로 치환한다(덮어쓰기 금지·멱등).
+   - **Windows(Git Bash)**: PATH에 bash가 없으므로 각 hook `command`를 `"C:/Program Files/Git/usr/bin/bash.exe" "<hook.sh 절대경로>"`로 감싼다. Git 설치 위치는 `where bash`/레지스트리로 **탐지해 치환**(위치가 다르면 훅 전멸 → fail-open). `jq`도 설치·PATH 확인(훅이 jq를 못 찾으면 fail-closed로 차단). (260629_2349)
    - 효과: `.env`·자격증명 읽기와 force-push·`reset --hard`·history rewrite를 PreToolUse가 **하드 차단**(exit 2), 세션 시작 시 boost 환기, 주요 작업 후 antithesis 미실행 시 Stop이 턴 종료를 막고 환기.
    - **검증 게이트(필수 — 통과 못 하면 "설치 완료" 보고 금지)**: `echo '{"tool_name":"Read","tool_input":{"file_path":"/x/.env"}}' | ~/.claude/hooks/guard-secrets.sh; echo $?` 가 반드시 **`2`(차단)**여야 한다. `0`(통과)이면 가드 무력(jq 누락 등) → 원인 해결 후 재검증. force-push도 `printf '{"tool_name":"Bash","tool_input":{"command":"git push --force"}}' | ~/.claude/hooks/guard-git.sh; echo $?` → `2` 확인.
 
