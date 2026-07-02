@@ -4,6 +4,8 @@
 # RPW 있는 프로젝트에서만 주입(무관 프로젝트 오염 방지). Stop 게이트·자문층은 의도적으로 전역 발동(260701) — 이 훅만 RPW 게이트. 의존: jq.
 set -u
 input="$(cat 2>/dev/null)"
+# 상태 GC(30일) — 세션당 1회 여기서(매 편집마다 돌던 mark-work에서 이관, 코호트 감사 260702). RPW 게이트보다 먼저.
+find "${HOME}/.claude/.harness_state" -type f -mtime +30 -delete 2>/dev/null
 cwd="$(printf '%s' "$input" | jq -r '.cwd // empty' 2>/dev/null)"
 [ -n "$cwd" ] && { [ -f "$cwd/rule_plan_work.md" ] || [ -f "$cwd/work.md" ]; } || exit 0
 cat <<'CTX'

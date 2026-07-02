@@ -18,12 +18,13 @@ cwd="$(printf '%s' "$input" | (jq -r '.cwd // empty' 2>/dev/null || echo ''))"
 [ -n "$cwd" ] || cwd="$PWD"
 dir="${HOME}/.claude/.harness_state"
 rd(){ v=$(cat "$dir/${sid}.$1" 2>/dev/null || echo 0); case "$v" in ''|*[!0-9]*) v=0 ;; esac; echo "$v"; }
-edits=$(rd edits); baseline=$(rd baseline); agy=$(rd agy); research=$(rd research)
+edits=$(rd edits); baseline=$(rd baseline); research=$(rd research)   # agy 카운터는 여기서 미사용(코호트 감사 260702 — dead read 제거)
 pending=$(( edits - baseline )); [ "$pending" -lt 0 ] && pending=0
 if   [ -f "$cwd/rule_plan_work.md" ]; then rpw="있음";
 elif [ -f "$cwd/work.md" ];          then rpw="있음(work.md)";
 else rpw="없음"; fi
-dv=$(find "$cwd/datavault" -maxdepth 1 -name '*.md' ! -name 'INDEX.md' 2>/dev/null | wc -l | tr -d ' '); case "$dv" in ''|*[!0-9]*) dv=0 ;; esac
+dv=0   # datavault 폴더 있을 때만 스캔(불필요 find 제거 — 코호트 감사 260702)
+[ -d "$cwd/datavault" ] && { dv=$(find "$cwd/datavault" -maxdepth 1 -name '*.md' ! -name 'INDEX.md' 2>/dev/null | wc -l | tr -d ' '); case "$dv" in ''|*[!0-9]*) dv=0 ;; esac; }
 
 # 물리 조건 → 후보 툴 목록(판단은 에이전트). 아래 슬롯형은 상위 최대 2개만(과부하 방지, 안티테제 1-C).
 # 순위: verify > antithesis > paper > RPW > Datavault.
@@ -32,11 +33,11 @@ dv=$(find "$cwd/datavault" -maxdepth 1 -name '*.md' ! -name 'INDEX.md' 2>/dev/nu
 paper=0; [ -f "$dir/${sid}.paper" ] && paper=1
 cand=""; n=0
 addc(){ [ "$n" -lt 2 ] && { cand="${cand} · $1"; n=$((n+1)); }; }
-[ "$pending" -ge 2 ] && addc "verify(수정 동작 확인했나?)"
-[ "$pending" -ge 3 ] && addc "antithesis(미검토편집 ${pending} — 독립검토?)"
-[ "$paper" = "1" ] && [ "$pending" -ge 2 ] && addc "paper(논문 파일 편집 — 컴파일·리뷰?)"
-[ "$rpw" = "없음" ] && [ "$edits" -ge 2 ] && addc "RPW생성(상태 스냅샷 없음)"
-[ "$edits" -ge 5 ] && [ "$dv" -eq 0 ] && addc "Datavault(결정·패턴을 원자 노트로?)"
+[ "$pending" -ge 2 ] && addc "verify(동작 확인?)"
+[ "$pending" -ge 3 ] && addc "antithesis(미검토 ${pending})"
+[ "$paper" = "1" ] && [ "$pending" -ge 2 ] && addc "paper(tex 편집 — 컴파일·리뷰?)"
+[ "$rpw" = "없음" ] && [ "$edits" -ge 2 ] && addc "RPW생성(스냅샷 없음)"
+[ "$edits" -ge 5 ] && [ "$dv" -eq 0 ] && addc "Datavault(결정→원자노트?)"
 
 # 코호트 하달 — 슬롯 경쟁 밖 독립·최우선 노출(사용자 지시 260702: 팍팍·병렬·백그라운드, 결과 미반영도 OK).
 # 트리거 = '마지막 agy 하달 이후 쌓인 작업(편집+조사 증분) ≥2'. 방출 = agy 하달(track-tools가 agy_be/agy_br 스냅샷 갱신 → 증분 0).
@@ -46,8 +47,8 @@ agy_be=$(rd agy_be); agy_br=$(rd agy_br)
 d_edits=$(( edits - agy_be )); [ "$d_edits" -lt 0 ] && d_edits=0
 d_res=$(( research - agy_br )); [ "$d_res" -lt 0 ] && d_res=0
 since=$(( d_edits + d_res )); cohort=""
-[ "$since" -ge 2 ] && cohort=" · clemini하달(마지막 하달 이후 편집 ${d_edits}·조사 ${d_res} — 조사·검토·1차반론을 Cohort에 병렬·백그라운드로, 결과 미반영 OK·유휴가 손해)"
+[ "$since" -ge 2 ] && cohort=" · clemini하달(미하달 편집${d_edits}·조사${d_res} — Cohort 병렬·백그라운드, 결과 미반영 OK)"
 
-# 후보 있을 때만 '자문' 1줄 주입. 코호트를 맨 앞에(최우선). 없으면 침묵.
-[ -n "$cand$cohort" ] && printf '[하네스 자문] 툴박스에 지금 쓸 것 있나?%s%s — 해당되면 실행(묻지 말고), 없으면 넘어가라.\n' "$cohort" "$cand"
+# 후보 있을 때만 '자문' 1줄 주입. 코호트를 맨 앞에(최우선). 없으면 침묵. (문구 압축 — 매 턴 주입 토큰, 코호트 감사 260702)
+[ -n "$cand$cohort" ] && printf '[하네스 자문] 지금 쓸 것?%s%s — 해당되면 묻지 말고 실행, 없으면 무시.\n' "$cohort" "$cand"
 exit 0

@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [0.3.2] - 260702
+최적화 패스 — 실측(자문 최악 380B·36ms, 세션 로드 8.4KB) 후 매 턴/매 편집 경로만 절감. 코호트 3파티션 감사 + Magos 통합(채택 7·기각 5 — 근거는 datavault [[260702_2250_optimization-pass-decisions]]).
+
+### Changed
+- **자문 문구 압축**: 매 턴 주입 380→245B(-36%), 의미 보존.
+- **GC 이관**: 상태 정리(find, 30일)를 mark-work(매 편집)→session-start-boost(세션 1회)로 — 편집당 I/O 제거.
+- **paper 마커 방출 경로**: antithesis ack 시 해제(한 번 .tex 만지면 세션 끝까지 자문 고착되던 것 해소).
+### Fixed
+- process-status: dead `agy` read 제거, datavault 폴더 존재 게이트(불필요 find 제거).
+### Rejected (기록)
+- 훅 공용 lib(가드 연쇄 마비 위험) · jq/cat 마이크로 최적화(실측 이득 미미) · README 영문 미러 삭제(사용자 지정 스타일) — 상세는 datavault.
+
 ## [0.3.1] - 260702
 코호트 상시 가동 — 실사용서 Gemini 하달을 거의 안 쓰던 문제(근본 원인: 전역 규칙·훅에 코호트 부재)의 구조적 해소.
 

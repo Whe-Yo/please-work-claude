@@ -14,11 +14,13 @@ inc(){ echo $(( $(rd "$1") + 1 )) > "$dir/${sid}.$1" 2>/dev/null; }
 # antithesis 시그니처(ack 판정). 알려진 한계: 키워드 기반이라 안티테제에 '관한' 조사도 ack될 수 있다(거짓 양성) —
 #   결과 반영 여부까지는 추적 불가(작업완료 마커 재프레임은 백로그).
 SIG='antithesis|안티테제|반론 검토|독립 검토자|독립 인스턴스'
+# ack = baseline 리셋 + paper 마커 해제(검토 묶음 종료 — .paper가 세션 끝까지 고착되던 것 수정, 코호트 감사 260702).
+ack(){ echo "$(rd edits)" > "$dir/${sid}.baseline" 2>/dev/null; rm -f "$dir/${sid}.paper" 2>/dev/null; }
 case "$tool" in
   Task)
-    # antithesis Task일 때만 baseline 리셋(=검토 ack). 다른 서브에이전트(Explore·구현 위임)는 리셋 안 함.
+    # antithesis Task일 때만 ack. 다른 서브에이전트(Explore·구현 위임)는 리셋 안 함.
     tp="$(printf '%s' "$input" | (jq -r '.tool_input.prompt // .tool_input.description // empty' 2>/dev/null || echo ''))"
-    printf '%s' "$tp" | grep -Eqi "$SIG" && echo "$(rd edits)" > "$dir/${sid}.baseline" 2>/dev/null
+    printf '%s' "$tp" | grep -Eqi "$SIG" && ack
     ;;
   WebSearch|WebFetch) inc research ;;
   Bash)
@@ -32,7 +34,7 @@ case "$tool" in
       echo "$(rd edits)" > "$dir/${sid}.agy_be" 2>/dev/null
       echo "$(rd research)" > "$dir/${sid}.agy_br" 2>/dev/null
       # agy 경유 검토(--deep 오프로드 등)는 antithesis도 ack — clemini '이원 안티테제'와 정합.
-      printf '%s' "$cmd" | grep -Eqi "$SIG" && echo "$(rd edits)" > "$dir/${sid}.baseline" 2>/dev/null
+      printf '%s' "$cmd" | grep -Eqi "$SIG" && ack
     fi
     ;;
 esac
