@@ -6,13 +6,18 @@
 
 ## [Unreleased]
 
+## [0.3.3] - 260702
+### Fixed
+- **`.agy` dead write 제거(260702 안티테제)**: 0.3.2에서 read를 없앤 뒤 카운터를 읽는 곳이 없어져 write-only가 된 `inc agy` 제거 — v0.3.0의 `review` dead write 제거와 같은 기준 적용. 넛지 스냅샷(agy_be/agy_br)은 유지.
+- **0.3.2 paper 방출 서술 정정**: "세션 끝까지 고착 해소"는 검토 수행 세션에서만 참 — 원문 정정 및 마커 TTL 백로그 명시.
+
 ## [0.3.2] - 260702
 최적화 패스 — 실측(자문 최악 380B·36ms, 세션 로드 8.4KB) 후 매 턴/매 편집 경로만 절감. 코호트 3파티션 감사 + Magos 통합(채택 7·기각 5 — 근거는 datavault [[260702_2250_optimization-pass-decisions]]).
 
 ### Changed
 - **자문 문구 압축**: 매 턴 주입 380→245B(-36%), 의미 보존.
 - **GC 이관**: 상태 정리(find, 30일)를 mark-work(매 편집)→session-start-boost(세션 1회)로 — 편집당 I/O 제거.
-- **paper 마커 방출 경로**: antithesis ack 시 해제(한 번 .tex 만지면 세션 끝까지 자문 고착되던 것 해소).
+- **paper 마커 방출 경로**: antithesis ack 시 해제. (정정 260702 안티테제: 검토를 수행하는 세션에서만 방출 — 검토 없는 논문 세션에선 슬롯 규칙(pending≥3 시 verify·antithesis 점유)으로 억제될 뿐 마커는 잔존. 마커 TTL은 백로그.)
 ### Fixed
 - process-status: dead `agy` read 제거, datavault 폴더 존재 게이트(불필요 find 제거).
 ### Rejected (기록)

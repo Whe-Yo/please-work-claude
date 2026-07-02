@@ -27,7 +27,7 @@ case "$tool" in
     cmd="$(printf '%s' "$input" | (jq -r '.tool_input.command // empty' 2>/dev/null || echo ''))"
     # 단어경계(-w) — 'magyar'·'pagy.txt'·'xdelegate.sh' 오탐 방지(260702 안티테제 C).
     if printf '%s' "$cmd" | grep -Ewq 'agy|delegate\.sh|delegate-fanout\.sh'; then
-      inc agy
+      # (구 `inc agy` 카운터는 260702 최적화로 읽는 곳이 사라져 dead write — 제거. 스냅샷 agy_be/agy_br만 유지.)
       # 마지막 하달 시점의 편집·조사 스냅샷 = 코호트 넛지 방출 경로(하달하면 증분 0 → 꺼짐). 260702 2차 안티테제 A/B:
       #   research 절대값(WebSearch만 증가 → agy 조사 시 자기소거)도, SIG 의존 pending(편집형 좀비)도 아닌
       #   '마지막 하달 이후 증분'으로 통일 → 조사를 agy로 하든 편집을 하든 하달만 하면 확실히 방출.
