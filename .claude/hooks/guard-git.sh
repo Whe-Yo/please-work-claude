@@ -21,14 +21,15 @@ printf '%s' "$scan" | grep -Eq '(^|[|&;(\`[:space:]])git([[:space:]]|$)' || exit
 has() { printf '%s' "$scan" | grep -Eq "$1"; }
 deny() { echo "차단(§9): 파괴적 git — $1. 명시 승인이 필요하다(히스토리 유실 위험). 정말 의도했다면 터미널에서 직접 실행하거나 훅을 일시 비활성화하라. 명령: $cmd" >&2; exit 2; }
 
-# force push (--force / -f) — 단 안전한 --force-with-lease / --force-if-includes는 면제(일상검토 260626)
-if has 'git[[:space:]]+([^|&;]*[[:space:]])?push([[:space:]]|$)' && has '(--force|[[:space:]]-f([[:space:]]|$))' && ! has 'force-with-lease|force-if-includes'; then deny "force push(plain)"; fi
+# force push (--force / -f) — 플래그가 push와 같은 파이프라인 조각 안에 있을 때만(260702 오탐 수정: 'rm -f x; git push'가
+#   전역 -f 매칭으로 차단되던 것). --force-with-lease/-if-includes는 경계 매칭(--force 뒤 공백/끝)이라 자연 면제.
+if has 'git[[:space:]]+([^|&;]*[[:space:]])?push[^|&;]*[[:space:]](--force|-f)([[:space:]]|$)'; then deny "force push(plain)"; fi
 # push +ref (강제 갱신)
 if has 'git[[:space:]]+([^|&;]*[[:space:]])?push' && has 'push[^|&;]*[[:space:]]\+[A-Za-z0-9_./-]'; then deny "push +ref(강제 갱신)"; fi
 # push --mirror
 if has 'git[[:space:]]+([^|&;]*[[:space:]])?push[^|&;]*--mirror'; then deny "push --mirror"; fi
-# reset --hard
-if has 'git[[:space:]]+([^|&;]*[[:space:]])?reset([[:space:]]|$)' && has '[[:space:]]--hard([[:space:]]|$)'; then deny "reset --hard"; fi
+# reset --hard — 같은 조각 내 인자일 때만(260702, force push와 동일 계열 수정)
+if has 'git[[:space:]]+([^|&;]*[[:space:]])?reset[^|&;]*[[:space:]]--hard([[:space:]]|$)'; then deny "reset --hard"; fi
 # history rewrite
 if has 'git[[:space:]]+([^|&;]*[[:space:]])?(filter-branch|filter-repo)([[:space:]]|$)'; then deny "history rewrite(filter-branch/repo)"; fi
 # ref/reflog 파괴 (히스토리 비가역 손실 — 유지)

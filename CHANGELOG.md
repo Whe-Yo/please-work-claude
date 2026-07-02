@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+## [0.3.4] - 260702
+### Fixed
+- **guard-git 근접성 오탐(실사용 적발 260702)**: force push·reset --hard 검사가 명령 전체에서 `-f`/`--hard` 존재만 보고 차단 — `rm -f x; git push`, `[ -f a ] && git push` 같은 무해 복합 명령이 막힘. **플래그가 해당 git 서브커맨드와 같은 파이프라인 조각(`[^|&;]*`) 안에 있을 때만** 매칭하도록 수정. 허용 6·차단 7 배터리 통과(force-with-lease 면제는 경계 매칭으로 자연 처리).
+
 ## [0.3.3] - 260702
 ### Fixed
 - **`.agy` dead write 제거(260702 안티테제)**: 0.3.2에서 read를 없앤 뒤 카운터를 읽는 곳이 없어져 write-only가 된 `inc agy` 제거 — v0.3.0의 `review` dead write 제거와 같은 기준 적용. 넛지 스냅샷(agy_be/agy_br)은 유지.
