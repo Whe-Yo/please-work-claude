@@ -12,8 +12,11 @@ input="$(cat)"
 cmd="$(printf '%s' "$input" | "$JQ" -r '.tool_input.command // empty' 2>/dev/null)"
 [ -n "$cmd" ] || exit 0
 
+# 개행 정규화(260702): 백슬래시-개행(연속행)은 공백으로 잇고, 맨 개행은 셸 의미 그대로 ';'로 —
+#   근접성 매칭([^|&;]*)이 줄 단위 grep에 갈라져 'git push \<개행> --force'를 놓치던 회귀 방지. bash 3.2 치환만 사용.
+cmd_n="${cmd//\\$'\n'/ }"; cmd_n="${cmd_n//$'\n'/;}"
 # 인용 구간(-m 메시지·echo 문자열 등) 제거 후 검사 — `git commit -m "...push --force..."` 거짓양성 방지(260629_2349).
-scan="$(printf '%s' "$cmd" | sed -E 's/"[^"]*"//g' | sed -E "s/'[^']*'//g")"
+scan="$(printf '%s' "$cmd_n" | sed -E 's/"[^"]*"//g' | sed -E "s/'[^']*'//g")"
 
 # git이 포함된 명령만 검사(인용 제거본 기준 — echo "git push --force"는 제외됨)
 printf '%s' "$scan" | grep -Eq '(^|[|&;(\`[:space:]])git([[:space:]]|$)' || exit 0
