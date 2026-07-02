@@ -5,3 +5,4 @@
 ## 하네스 설계 패턴
 - [[260702_1126_install-doc-drift]] — 설치 문서의 파일 나열이 실행 구성과 어긋나 층 전체가 침묵 사망한 안티패턴.
 - [[260702_1126_counters-posttooluse]] — 계측 훅은 PostToolUse(성공만 측정)로 둔다는 결정.
+- [[260702_1510_cohort-critiques-own-activation]] — 하네스 자기변경도 코호트 1차 반론에 걸면 싸게 결함이 잡힌다(좀비 알림 실증).
